@@ -1,0 +1,61 @@
+---
+  - name: Install nodejs and configure catalogue Application 
+    hosts: catalogue
+    become: yes
+    vars:
+       packages:
+          - nodejs 
+          - make 
+          - gcc-c++
+       user: roboshop
+    tasks:
+      - name: install packages
+        yum:
+          name: "{{ item }}"
+          state: latest
+        loop: "{{ packages }}"
+      - name: creating  {{ user }} user
+        user: 
+          name: "{{ user }}"
+          state: present
+      - name: download application content from git
+        get_url:
+           url: https://github.com/rshaik4devops/catalogue/archive/main.zip
+           dest: /tmp/catalogue.zip
+      - name: unarchive application content
+        unarchive:
+          src: /tmp/catalogue.zip
+          dest:  /home/roboshop/
+      - name: move catalogue-main to catalogue
+        command:  mv catalogue-main catalogue
+        args:
+          chdir: /home/roboshop
+      - name: install  catalogue
+        command: npm install
+        args:
+          chdir: /home/roboshop/catalogue
+      - name: create a service file
+        copy:
+          src: /home/roboshop/catalogue/systemd.service
+          dest: /etc/systemd/system/catalogue.service
+          remote_src: true
+      - name: enable catalogue service 
+        systemd:
+           name: catalogue
+           enabled: true
+      - name: start the catalogue service
+        systemd:
+           name: catalogue
+           state: started
+
+
+
+
+
+
+            
+
+        
+
+
+      
