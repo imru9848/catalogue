@@ -26,6 +26,7 @@
         unarchive:
           src: /tmp/catalogue.zip
           dest:  /home/roboshop/
+          remote_src: true
       - name: move catalogue-main to catalogue
         command:  mv catalogue-main catalogue
         args:
